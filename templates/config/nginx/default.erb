@@ -1,0 +1,16 @@
+server {
+  listen      80 default_server;
+  server_name localhost _;
+
+  root   <%= scope.lookupvar "nginx::config::configdir" %>/public;
+
+  access_log <%= scope.lookupvar "nginx::config::logdir" %>/access.log ltsv;
+  error_log  <%= scope.lookupvar "nginx::config::logdir" %>/error.log;
+
+  location /nginx_status {
+    stub_status on;
+    access_log  off;
+    allow 127.0.0.1;
+    deny  all;
+  }
+}

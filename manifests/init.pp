@@ -2,7 +2,6 @@
 #
 class nginx(
   $ensure = present,
-  $port = 80,
 ) {
   include nginx::config
   include homebrew
@@ -37,6 +36,15 @@ class nginx(
         notify  => Service['dev.nginx']
       }
 
+      file { "${nginx::config::sitesdir}/default":
+        content => template('nginx/config/nginx/default.erb'),
+        notify  => Service['dev.nginx']
+      }
+
+      file { '/w/etc/nginx':
+        ensure  => directory
+      }
+
       file { "${nginx::config::configdir}/mime.types":
         notify  => Service['dev.nginx'],
         source  => 'puppet:///modules/nginx/config/nginx/mime.types'
@@ -52,35 +60,70 @@ class nginx(
       }
 
       homebrew::formula { 'nginx':
-        before => Package['boxen/brews/nginx'],
+        before => Package['boxen/brews/nginx-full']
       }
 
-      package { 'boxen/brews/nginx':
-        ensure          => '1.10.0-boxen1',
+      homebrew::tap { 'homebrew/nginx': }
+
+      homebrew::formula { 'nginx-full':
+        before => Package['boxen/brews/nginx-full']
+      }
+
+      # https://github.com/Homebrew/homebrew-nginx/blob/master/Formula/nginx-full.rb
+      # --with-perl: Do not have write permissions on '/Library/Perl/5.18/darwin-thread-multi-2level'
+      package { 'boxen/brews/nginx-full':
         install_options => [
-          '--with-http2',
-        ],
+                            '--devel',
+                            # core modules
+                            '--with-passenger',     # Compile with support for Phusion Passenger module
+                            #'--no-pool-nginx',     # Disable nginx-pool, valgrind detect memory issues
+                            '--with-addition',      # HTTP Addition module
+                            '--with-auth-req',      # HTTP Auth Request module
+                            #'--with-debug',        # debug log
+                            '--with-degredation',   # HTTP Degredation module
+                            '--with-flv',           # FLV module
+                            '--with-geoip',         # GeoIP module
+                            '--with-google-perftools', # Google Performance tools module
+                            '--with-gunzip',        # gunzip module
+                            '--with-gzip-static',   # gunzip module
+                            '--with-http2',         # HTTP/2 mmodule
+                            '--with-image-filter',  # Image Filter module
+                            '--with-mail',          # Mail module
+                            '--with-mp4',           # MP4 module
+                            '--with-pcre-jit',      # JIIT in PCRE
+                            "--with-perl=${boxen::config::homebrewdir}/perl", # Perl module
+                            '--with-random-index',  # Random Index module
+                            '--with-realip',        # real IP module
+                            '--with-secure-link',   # secure link module
+                            '--with-status',        # stub status module
+                            '--with-stream',        # TCP load balancing module
+                            '--with-sub',           # HTTP Sub module
+                            '--with-webdav',        # WebDAV module
+                            '--with-xslt',          # XSLT module
+                            # third_party_modules
+                            '--with-mruby-module',  # MRuby module
+                            '--with-lua',           # Lua mmodule
+                            ],
+        require         => Homebrew::Tap['homebrew/nginx'],
         notify          => Service['dev.nginx']
       }
 
       # Remove Homebrew's nginx config to avoid confusion.
 
       file { "${boxen::config::homebrewdir}/etc/nginx":
-        ensure  => absent,
-        force   => true,
-        recurse => true,
-        require => Package['boxen/brews/nginx']
+        ensure => link,
+        target => "${boxen::config::configdir}/nginx"
       }
 
       service { 'dev.nginx':
         ensure  => running,
-        require => Package['boxen/brews/nginx']
+        require => Package['boxen/brews/nginx-full']
       }
     }
 
     absent: {
       service { 'dev.nginx':
-        ensure  => stopped,
+        ensure => stopped
       }
 
       file { '/Library/LaunchDaemons/dev.nginx.plist':
@@ -96,8 +139,8 @@ class nginx(
         ensure => absent
       }
 
-      package { 'boxen/brews/nginx':
-        ensure => absent,
+      package { 'nginx-full':
+        ensure => absent
       }
     }
 

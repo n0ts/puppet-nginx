@@ -3,9 +3,14 @@ daemon off;
 user <%= scope.lookupvar "::boxen_user" %> staff;
 
 worker_processes 2;
+worker_priority  0;
 pid <%= scope.lookupvar "nginx::config::pidfile" %>;
 
 events {
+  accept_mutex on;
+  accept_mutex_delay 100ms;
+  multi_accept off;
+  use kqueue;
   worker_connections 1024;
 }
 
@@ -16,19 +21,61 @@ http {
   log_format main '$remote_addr - $remote_user [$time_local] $status '
                   '"$request" $body_bytes_sent "$http_referer" '
                   '"$http_user_agent" "http_x_forwarded_for"';
+  log_format ltsv 'host:$host\t'
+                  'ts:$time_iso8601\t'
+                  'ip:$remote_addr\t'
+                  'method:$request_method\t'
+                  'path:$request_uri\t'
+                  'status:$status\t'
+                  'size_req:$request_length\t'
+                  'size_res:$bytes_sent\t'
+                  'size_body:$body_bytes_sent\t'
+                  'time_req:$request_time\t'
+                  'time_app:$upstream_response_time\t'
+                  'referer:$http_referer\t'
+                  'ua:$http_user_agent';
+  log_format ltsv_backend 'host:$host\t'
+                          'ts:$time_iso8601\t'
+                          'ip:$remote_addr\t'
+                          'method:$request_method\t'
+                          'forwarded_for:$http_x_forwarded_for\t'
+                          'forwarded_proto:$http_x_forwarded_proto\t'
+                          'forwarded_port:$http_x_forwarded_port\t'
+                          'path:$request_uri\t'
+                          'status:$status\t'
+                          'size_req:$request_length\t'
+                          'size_res:$bytes_sent\t'
+                          'size_body:$body_bytes_sent\t'
+                          'time_req:$request_time\t'
+                          'time_app:$upstream_response_time\t'
+                          'referer:$http_referer\t'
+                          'ua:$http_user_agent';
 
-  access_log <%= scope.lookupvar "nginx::config::logdir" %>/access.log main;
+  access_log <%= scope.lookupvar "nginx::config::logdir" %>/access.log ltsv;
   error_log  <%= scope.lookupvar "nginx::config::logdir" %>/error.log debug;
 
   sendfile on;
 
-  tcp_nopush  on;
   tcp_nodelay off;
+  tcp_nopush  on;
 
-  gzip              on;
-  gzip_http_version 1.0;
-  gzip_comp_level   2;
-  gzip_proxied      any;
+  gzip off;
+  gzip_disable msie6;
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_comp_level 6;
+  gzip_min_length 1000;
+  gzip_buffers 16 8k;
+  gzip_http_version 1.1;
+  gzip_types text/plain
+             text/css
+             text/javascript
+             text/xml
+             application/javascript
+             application/json
+             application/x-javascript
+             application/xml
+             application/xml+rss;
 
   server_names_hash_bucket_size 128;
   server_names_hash_max_size 20000;
@@ -37,14 +84,8 @@ http {
 
   underscores_in_headers on;
 
-  server {
-    listen      <%= @port %> default_server;
-    server_name localhost;
-
-    location / {
-      root   <%= scope.lookupvar "nginx::config::configdir" %>/public;
-    }
-  }
+  open_file_cache max=100 inactive=60s;
 
   include <%= scope.lookupvar "nginx::config::sitesdir" %>/*;
+  include /w/etc/nginx/*;
 }

@@ -3,7 +3,8 @@ require 'spec_helper'
 describe 'nginx' do
   let(:facts) do
     {
-      :boxen_home => '/test/boxen'
+      :boxen_home => '/test/boxen',
+      :boxen_confgidir => '/test/boxen/config'
     }
   end
 
@@ -38,23 +39,23 @@ describe 'nginx' do
     })
 
     should contain_homebrew__formula('nginx').
-      with_before('Package[boxen/brews/nginx]')
+      with_before('Package[boxen/brews/nginx-full]')
 
-    should contain_package('boxen/brews/nginx').with({
-      :ensure => '1.10.0-boxen1',
-      :notify => 'Service[dev.nginx]'
+    should contain_homebrew__tap('homebrew/nginx')
+
+    should contain_package('boxen/brews/nginx-full').with({
+      :require => 'Homebrew::Tap[homebrew/nginx]',
+      :notify  => 'Service[dev.nginx]'
     })
 
     should contain_file('/test/boxen/homebrew/etc/nginx').with({
-      :ensure  => 'absent',
-      :force   => true,
-      :recurse => true,
-      :require => 'Package[boxen/brews/nginx]'
+      :ensure => 'link',
+      :target => "/test/boxen/config/nginx",
     })
 
     should contain_service('dev.nginx').with({
       :ensure  => 'running',
-      :require => 'Package[boxen/brews/nginx]',
+      :require => 'Package[boxen/brews/nginx-full]',
     })
   end
 

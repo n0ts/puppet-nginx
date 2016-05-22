@@ -8,13 +8,6 @@ Status](https://travis-ci.org/boxen/puppet-nginx.svg?branch=master)](https://tra
 include nginx
 ```
 
-To specify a different port than 80:
-```puppet
-class { "nginx":
-    port => 8080
-}
-```
-
 ## Required Puppet Modules
 
 * boxen
