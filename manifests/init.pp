@@ -59,19 +59,14 @@ class nginx(
         source  => 'puppet:///modules/nginx/config/nginx/public'
       }
 
-      homebrew::formula { 'nginx':
-        before => Package['boxen/brews/nginx-full']
-      }
-
       homebrew::tap { 'homebrew/nginx': }
 
-      homebrew::formula { 'nginx-full':
-        before => Package['boxen/brews/nginx-full']
+      package { 'gd':
+        before => Package['nginx-full'],
       }
 
       # https://github.com/Homebrew/homebrew-nginx/blob/master/Formula/nginx-full.rb
-      # --with-perl: Do not have write permissions on '/Library/Perl/5.18/darwin-thread-multi-2level'
-      package { 'boxen/brews/nginx-full':
+      package { 'nginx-full':
         install_options => [
                             '--devel',
                             # core modules
@@ -117,7 +112,7 @@ class nginx(
 
       service { 'dev.nginx':
         ensure  => running,
-        require => Package['boxen/brews/nginx-full']
+        require => Package['nginx-full']
       }
     }
 

@@ -38,12 +38,9 @@ describe 'nginx' do
       :source  => 'puppet:///modules/nginx/config/nginx/public'
     })
 
-    should contain_homebrew__formula('nginx').
-      with_before('Package[boxen/brews/nginx-full]')
-
     should contain_homebrew__tap('homebrew/nginx')
 
-    should contain_package('boxen/brews/nginx-full').with({
+    should contain_package('nginx-full').with({
       :require => 'Homebrew::Tap[homebrew/nginx]',
       :notify  => 'Service[dev.nginx]'
     })
@@ -55,7 +52,7 @@ describe 'nginx' do
 
     should contain_service('dev.nginx').with({
       :ensure  => 'running',
-      :require => 'Package[boxen/brews/nginx-full]',
+      :require => 'Package[nginx-full]',
     })
   end
 
