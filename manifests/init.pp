@@ -61,7 +61,7 @@ class nginx(
 
       homebrew::tap { 'homebrew/nginx': }
 
-      package { 'gd':
+      package { [ 'gd', 'gperftools' ]:
         before => Package['nginx-full'],
       }
 
