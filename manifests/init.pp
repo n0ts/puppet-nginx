@@ -97,7 +97,9 @@ class nginx(
                             '--with-xslt',          # XSLT module
                             # third_party_modules
                             '--with-mruby-module',  # MRuby module
-                            '--with-lua',           # Lua mmodule
+                            # for MRuby module https://github.com/Homebrew/homebrew-nginx/issues/312
+                            '--no-sandbox',
+                            '--with-lua-module',    # Lua mmodule
                             ],
         require         => Homebrew::Tap['homebrew/nginx'],
         notify          => Service['dev.nginx']
