@@ -1,10 +1,10 @@
 require 'formula'
 
 class Nginx < Formula
-  homepage 'http://nginx.org/'
-  url "http://nginx.org/download/nginx-1.10.0.tar.gz"
-  sha256 "8ed647c3dd65bc4ced03b0e0f6bf9e633eff6b01bac772bcf97077d58bc2be4d"
-  version '1.10.0-boxen1'
+  homepage 'https://nginx.org/'
+  url 'https://nginx.org/download/nginx-1.10.2.tar.gz'
+  sha256 '1045ac4987a396e2fa5d0011daf8987b612dd2f05181b67507da68cbe7d765c2'
+  version '1.10.2-boxen1'
 
   depends_on 'pcre'
 
@@ -47,7 +47,7 @@ class Nginx < Formula
             "--with-ipv6",
             "--with-cc-opt=#{cc_opt}",
             "--with-ld-opt=#{ld_opt}",
-            "--conf-path=/opt/boxen/config/nginx/nginx.conf",
+            "--conf-path=#{etc}/boxen/nginx/nginx.conf",
             "--pid-path=/opt/boxen/data/nginx/nginx.pid",
             "--lock-path=/opt/boxen/data/nginx/nginx.lock"]
 
