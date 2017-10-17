@@ -65,8 +65,7 @@ class nginx(
       }
 
       # https://github.com/Homebrew/homebrew-nginx/blob/master/Formula/nginx-full.rb
-      # nginx-full install default module ption
-      #   --with-http_ssl_module --with-pcre --with-ipv6
+      # nginx-full install default module option: --with-http_ssl_module --with-pcre --with-ipv6
       package { 'nginx-full':
         install_options => [
                             '--devel',
