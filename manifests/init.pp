@@ -2,8 +2,7 @@
 #
 class nginx(
   $ensure = present,
-) {
-  include nginx::config
+) inherits nginx::config {
   include homebrew
 
   case $ensure {
@@ -46,8 +45,8 @@ class nginx(
       }
 
       file { "${nginx::config::configdir}/mime.types":
-        notify  => Service['dev.nginx'],
-        source  => 'puppet:///modules/nginx/config/nginx/mime.types'
+        notify => Service['dev.nginx'],
+        source => 'puppet:///modules/nginx/config/nginx/mime.types'
       }
 
       # Set up a very friendly little default one-page site for when
@@ -120,7 +119,11 @@ class nginx(
                             '--with-dosdetector-module',         # Detecting DoS attacks support
                             '--with-echo-module',                # Echo support
                             '--with-eval-module',                # Eval support
-                            ##'--with-extended-status-module',     # Extended Status support - patch error: Failure while executing: /usr/bin/patch -g 0 -f -p1 -i nginx-full--patch-20171017-74250-7diioa/extended_status-1.10.1.patch
+                            ##'--with-extended-status-module',     # Extended Status support
+                            #### patch error:
+                            #### Failure while executing:
+                            #### /usr/bin/patch -g 0 -f -p1 -i
+                            ####    nginx-full--patch-20171017-74250-7diioa/extended_status-1.10.1.patch
                             ##'--with-fancyindex-module',          # Fancy Index support
                             '--with-geoip2-module',              # GeoIP2 support
                             ##'--with-headers-more-module',        # Headers More support

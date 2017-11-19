@@ -1,11 +1,7 @@
 require 'spec_helper'
 
 describe 'nginx::config' do
-  let(:facts) do
-    {
-      :boxen_home => '/test/boxen'
-    }
-  end
+  let(:facts) { default_test_facts }
 
   it do
     should contain_class('boxen::config')
