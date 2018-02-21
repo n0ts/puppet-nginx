@@ -40,10 +40,6 @@ class nginx(
         notify  => Service['dev.nginx']
       }
 
-      file { '/w/etc/nginx':
-        ensure  => directory
-      }
-
       file { "${nginx::config::configdir}/mime.types":
         notify => Service['dev.nginx'],
         source => 'puppet:///modules/nginx/config/nginx/mime.types'
@@ -57,7 +53,7 @@ class nginx(
         source  => 'puppet:///modules/nginx/config/nginx/public'
       }
 
-      homebrew::tap { 'homebrew/nginx': }
+      homebrew::tap { 'denji/nginx': }
 
       package { [ 'gd', 'gperftools' ]:
         before => Package['nginx-full'],
@@ -164,7 +160,7 @@ class nginx(
                             # for MRuby module https://github.com/Homebrew/homebrew-nginx/issues/312
                             '--no-sandbox',
                             ],
-        require         => Homebrew::Tap['homebrew/nginx'],
+        require         => Homebrew::Tap['denji/nginx'],
         notify          => Service['dev.nginx']
       }
 
