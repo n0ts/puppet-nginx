@@ -33,10 +33,10 @@ describe 'nginx' do
       :source  => 'puppet:///modules/nginx/config/nginx/public'
     })
 
-    should contain_homebrew__tap('homebrew/nginx')
+    should contain_homebrew__tap('denji/nginx')
 
     should contain_package('nginx-full').with({
-      :require => 'Homebrew::Tap[homebrew/nginx]',
+      :require => 'Homebrew::Tap[denji/nginx]',
       :notify  => 'Service[dev.nginx]'
     })
 
