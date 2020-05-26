@@ -62,8 +62,8 @@ class nginx(
       # https://github.com/Homebrew/homebrew-nginx/blob/master/Formula/nginx-full.rb
       # nginx-full install default module option: --with-http_ssl_module --with-pcre --with-ipv6
       package { 'nginx-full':
+        ensure          => latest,
         install_options => [
-                            '--devel',
                             # core modules
                             '--with-addition',                   # HTTP Addition support
                             '--with-auth-req',                   # HTTP Auth Request support
@@ -157,8 +157,6 @@ class nginx(
                             ##'--with-vod-module',                 # VOD on-the-fly MP4 Repackager support
                             ##'--with-websockify-module'.          # Websockify support
                             ##'--with-xsltproc-module'.            # XSLT Transformations support
-                            # for MRuby module https://github.com/Homebrew/homebrew-nginx/issues/312
-                            '--no-sandbox',
                             ],
         require         => Homebrew::Tap['denji/nginx'],
         notify          => Service['dev.nginx']
