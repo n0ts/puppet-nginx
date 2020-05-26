@@ -132,7 +132,10 @@ class nginx(
                             ##'--with-mod-zip-module',             # HTTP Zip support - compile error
                             ##'--with-mogilefs-module',            # HTTP MogileFS support
                             '--with-mp4-h264-module',            # HTTP MP4/H264 support
-                            '--with-mruby-module',               # MRuby support
+                            # BUILD ERROR
+                            # mruby-nginx-module/2.1.0/share/mruby-nginx-module/.git:
+                            # Operation not permitted
+                            ##'--with-mruby-module',               # MRuby support
                             ##'--with-naxsi-module',               # Naxsi support
                             ##'--with-nchan-module',               # Nchan support
                             ##'--with-notice-module',              # HTTP Notice support
